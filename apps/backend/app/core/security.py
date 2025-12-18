@@ -4,6 +4,8 @@ from jose import jwt
 from passlib.context import CryptContext
 from app.core.config import settings
 
+ALGORITHM = settings.ALGORITHM
+
 # Using argon2 with moderate parameters for a balance of security and speed during dev
 pwd_context = CryptContext(
     schemes=["argon2"], 

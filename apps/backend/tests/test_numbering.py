@@ -2,10 +2,17 @@ import pytest
 from app.services.numbering import numbering_service
 from app.models.business import DocType
 
+from app.models.core import Company
+
 @pytest.mark.asyncio
 async def test_get_next_number_format(db_session):
-    # Test numbering for a specific company and year
-    company_id = 999
+    # Create a dummy company first
+    company = Company(name="Test Company")
+    db_session.add(company)
+    await db_session.commit()
+    await db_session.refresh(company)
+    
+    company_id = company.id
     doc_type = DocType.INVOICE
     
     number = await numbering_service.get_next_number(db_session, company_id, doc_type)

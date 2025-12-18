@@ -26,8 +26,8 @@ async function request(endpoint: string, options: RequestInit = {}) {
 }
 
 export const api = {
-    get: (endpoint: string, options: any = {}) => request(endpoint, { method: "GET", ...options }),
-    post: (endpoint: string, body: any) => request(endpoint, { method: "POST", body: JSON.stringify(body) }),
-    patch: (endpoint: string, body: any) => request(endpoint, { method: "PATCH", body: JSON.stringify(body) }),
+    get: (endpoint: string, options: RequestInit = {}) => request(endpoint, { method: "GET", ...options }),
+    post: (endpoint: string, body: Record<string, unknown>) => request(endpoint, { method: "POST", body: JSON.stringify(body) }),
+    patch: (endpoint: string, body: Record<string, unknown>) => request(endpoint, { method: "PATCH", body: JSON.stringify(body) }),
     delete: (endpoint: string) => request(endpoint, { method: "DELETE" }),
 }

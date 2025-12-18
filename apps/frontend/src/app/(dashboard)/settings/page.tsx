@@ -24,8 +24,9 @@ export default function SettingsPage() {
             try {
                 const data = await api.get("/companies/me")
                 setCompany(data)
-            } catch (err: any) {
-                toast.error(err.message)
+            } catch (err) {
+                const error = err as Error
+                toast.error(error.message)
             } finally {
                 setLoading(false)
             }
@@ -39,8 +40,9 @@ export default function SettingsPage() {
         try {
             await api.patch("/companies/me", company)
             toast.success("Settings updated successfully")
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setSaving(false)
         }

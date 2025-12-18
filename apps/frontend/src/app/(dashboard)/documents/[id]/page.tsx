@@ -126,6 +126,7 @@ export default function DocumentEditor() {
 
     async function handlePreview() {
         try {
+            if (!doc) return
             const res = await fetch(`${API_URL}/templates/${doc.template_id}/test-render`, {
                 method: "POST",
                 headers: {
@@ -139,6 +140,7 @@ export default function DocumentEditor() {
             const url = window.URL.createObjectURL(blob)
             const a = document.createElement("a")
             a.href = url
+            if (!doc) return
             a.download = `preview_${doc.type}_${doc.id}.docx`
             document.body.appendChild(a)
             a.click()
@@ -177,7 +179,7 @@ export default function DocumentEditor() {
                     </Button>
                     <Button
                         onClick={handleGenerate}
-                        disabled={generating || doc.status === 'GENERATED'}
+                        disabled={generating || (doc?.status === 'GENERATED')}
                         className="bg-green-600 hover:bg-green-700 rounded-xl shadow-lg shadow-green-600/20 px-6 font-bold"
                     >
                         {generating ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
@@ -212,11 +214,11 @@ export default function DocumentEditor() {
                                 {template?.schema_json?.properties ? (
                                     <div className="grid gap-6">
                                         {Object.keys(template.schema_json.properties).map((key) => {
-                                            const prop = template.schema_json.properties[key]
+                                            const prop = template.schema_json.properties![key]
                                             return (
                                                 <div key={key} className="space-y-2 group">
                                                     <Label htmlFor={key} className="text-sm font-bold text-slate-700 group-focus-within:text-indigo-600 transition-colors">
-                                                        {prop.title || key}
+                                                        {prop?.title || key}
                                                     </Label>
                                                     <Input
                                                         id={key}
@@ -251,7 +253,9 @@ export default function DocumentEditor() {
                         <CardContent className="space-y-4">
                             <div>
                                 <p className="text-lg font-black text-slate-900 leading-tight">{client?.name}</p>
-                                <p className="text-xs font-semibold text-slate-400 mt-1 uppercase tracking-tight">Client Since {new Date(client?.created_at).getFullYear()}</p>
+                                <p className="text-xs font-semibold text-slate-400 mt-1 uppercase tracking-tight">
+                                    Client Since {client?.created_at ? new Date(client.created_at).getFullYear() : 'N/A'}
+                                </p>
                             </div>
                             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 italic text-sm text-slate-600">
                                 {client?.address || "No address provided"}
@@ -281,7 +285,7 @@ export default function DocumentEditor() {
                     <div className="bg-green-50 rounded-3xl p-6 border border-green-100 border-dashed">
                         <div className="flex items-center space-x-3 text-green-700 mb-2">
                             <CheckCircle2 className="h-5 w-5" />
-                            <span className="font-bold text-sm">Status: {doc.status}</span>
+                            <span className="font-bold text-sm">Status: {doc?.status}</span>
                         </div>
                         <p className="text-xs text-green-600 font-medium leading-relaxed">
                             {doc.status === 'DRAFT'

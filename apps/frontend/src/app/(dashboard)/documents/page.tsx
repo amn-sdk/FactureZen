@@ -11,7 +11,6 @@ import {
     FileBadge
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import {
     Dialog,
@@ -219,7 +218,7 @@ export default function DocumentsPage() {
                                 <FileBadge className="h-10 w-10 text-slate-300" />
                             </div>
                             <p className="font-semibold text-slate-900">No documents yet</p>
-                            <p className="text-sm mt-1 mb-6">Create your first draft by clicking "New Document"</p>
+                            <p className="text-sm mt-1 mb-6">Create your first draft by clicking &quot;New Document&quot;</p>
                             <Button variant="outline" onClick={() => setNewDocOpen(true)}>
                                 Get Started
                             </Button>

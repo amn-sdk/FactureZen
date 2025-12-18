@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import {
     Plus,
-    Search,
     FileText,
     Trash2,
     Download,
@@ -33,13 +32,25 @@ import { Label } from "@/components/ui/label"
 import { api, API_URL } from "@/lib/api"
 import { toast } from "sonner"
 
+interface Template {
+    id: number
+    name: string
+    type: string
+    version: number
+    created_at: string
+    docx_source_url: string
+    schema_json?: {
+        properties?: Record<string, { title?: string; type?: string }>
+    }
+}
+
 export default function TemplatesPage() {
-    const [templates, setTemplates] = useState([])
+    const [templates, setTemplates] = useState<Template[]>([])
     const [loading, setLoading] = useState(true)
     const [open, setOpen] = useState(false)
     const [testRenderOpen, setTestRenderOpen] = useState(false)
-    const [selectedTemplate, setSelectedTemplate] = useState<any>(null)
-    const [testData, setTestData] = useState<any>({})
+    const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null)
+    const [testData, setTestData] = useState<Record<string, string>>({})
     const [uploading, setUploading] = useState(false)
     const [rendering, setRendering] = useState(false)
 
@@ -47,8 +58,9 @@ export default function TemplatesPage() {
         try {
             const data = await api.get("/templates/")
             setTemplates(data)
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setLoading(false)
         }
@@ -88,8 +100,9 @@ export default function TemplatesPage() {
             toast.success("Template uploaded successfully")
             setOpen(false)
             loadTemplates()
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setUploading(false)
         }
@@ -99,6 +112,7 @@ export default function TemplatesPage() {
         e.preventDefault()
         setRendering(true)
         try {
+            if (!selectedTemplate) return
             const res = await fetch(`${API_URL}/templates/${selectedTemplate.id}/test-render`, {
                 method: "POST",
                 headers: {
@@ -120,8 +134,9 @@ export default function TemplatesPage() {
             a.remove()
             toast.success("Preview generated!")
             setTestRenderOpen(false)
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setRendering(false)
         }
@@ -132,8 +147,9 @@ export default function TemplatesPage() {
             await api.delete(`/templates/${id}`)
             toast.success("Template deleted")
             loadTemplates()
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         }
     }
 
@@ -207,19 +223,22 @@ export default function TemplatesPage() {
                         </DialogHeader>
                         <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
                             {selectedTemplate?.schema_json?.properties &&
-                                Object.keys(selectedTemplate.schema_json.properties).map((key) => (
-                                    <div key={key} className="space-y-2">
-                                        <Label htmlFor={key}>{selectedTemplate.schema_json.properties[key].title || key}</Label>
-                                        <Input
-                                            id={key}
-                                            type={selectedTemplate.schema_json.properties[key].type === "number" ? "number" : "text"}
-                                            onChange={(e) => setTestData({ ...testData, [key]: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                ))
+                                Object.keys(selectedTemplate.schema_json.properties).map((key) => {
+                                    const prop = selectedTemplate.schema_json!.properties![key]
+                                    return (
+                                        <div key={key} className="space-y-2">
+                                            <Label htmlFor={key}>{prop?.title || key}</Label>
+                                            <Input
+                                                id={key}
+                                                type={prop?.type === "number" ? "number" : "text"}
+                                                onChange={(e) => setTestData({ ...testData, [key]: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                    )
+                                })
                             }
-                            {Object.keys(selectedTemplate?.schema_json?.properties || {}).length === 0 && (
+                            {(!selectedTemplate?.schema_json?.properties || Object.keys(selectedTemplate.schema_json.properties).length === 0) && (
                                 <p className="text-sm text-slate-500 italic">No variables detected in this template.</p>
                             )}
                         </div>
@@ -250,7 +269,7 @@ export default function TemplatesPage() {
                         </CardContent>
                     </Card>
                 ) : (
-                    templates.map((template: any) => (
+                    templates.map((template) => (
                         <Card key={template.id}>
                             <CardContent className="flex items-center justify-between p-6">
                                 <div className="flex items-center space-x-4">
