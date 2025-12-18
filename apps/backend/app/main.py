@@ -1,8 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.core.logging import setup_logging, LoggingMiddleware
 from app.api import auth, companies, clients, templates, documents, accountant
 
 app = FastAPI(title="FactureZen API", version="0.1.0")
+setup_logging()
+app.add_middleware(LoggingMiddleware)
 
 # Configure CORS
 app.add_middleware(
