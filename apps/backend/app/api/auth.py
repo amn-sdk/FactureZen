@@ -26,6 +26,8 @@ async def login(login_data: Login, db: AsyncSession = Depends(get_db)):
         "token_type": "bearer",
     }
 
+from app.models.core import User, Company, Membership, Role
+
 @router.post("/register", response_model=UserOut)
 async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     # Check if user exists
@@ -39,6 +41,23 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
         full_name=user_in.full_name
     )
     db.add(user)
+    await db.flush() # Get user ID
+    
+    # Create default company for the user
+    company = Company(
+        name=f"{user.full_name or user.email}'s Company",
+    )
+    db.add(company)
+    await db.flush() # Get company ID
+    
+    # Create membership
+    membership = Membership(
+        user_id=user.id,
+        company_id=company.id,
+        role=Role.ADMIN
+    )
+    db.add(membership)
+    
     await db.commit()
     await db.refresh(user)
     return user
