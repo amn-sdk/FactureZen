@@ -2,7 +2,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
-    FileText,
     Users,
     Library,
     TrendingUp,
@@ -78,8 +77,8 @@ export default function Dashboard() {
                             <div className="text-3xl font-bold text-slate-900">{stat.value}</div>
                             <div className="flex items-center mt-1">
                                 <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${stat.changeType === "increase" ? "bg-green-100 text-green-700" :
-                                        stat.changeType === "decrease" ? "bg-amber-100 text-amber-700" :
-                                            "bg-slate-100 text-slate-700"
+                                    stat.changeType === "decrease" ? "bg-amber-100 text-amber-700" :
+                                        "bg-slate-100 text-slate-700"
                                     }`}>
                                     {stat.change}
                                 </span>
@@ -99,8 +98,8 @@ export default function Dashboard() {
                         {recentActivity.map((activity) => (
                             <div key={activity.id} className="flex items-start space-x-4 p-3 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100">
                                 <div className={`mt-1 p-1.5 rounded-full ${activity.status === 'success' ? 'bg-green-100 text-green-600' :
-                                        activity.status === 'draft' ? 'bg-blue-100 text-blue-600' :
-                                            'bg-slate-100 text-slate-600'
+                                    activity.status === 'draft' ? 'bg-blue-100 text-blue-600' :
+                                        'bg-slate-100 text-slate-600'
                                     }`}>
                                     {activity.status === 'success' ? <CheckCircle2 className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
                                 </div>

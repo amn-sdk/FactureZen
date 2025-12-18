@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Plus, Search, Archive } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,28 +13,30 @@ export default function ClientsPage() {
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
 
-    async function loadClients() {
+    const loadClients = useCallback(async () => {
         try {
             const data = await api.get(`/clients?search=${search}`)
             setClients(data)
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setLoading(false)
         }
-    }
+    }, [search])
 
     useEffect(() => {
         loadClients()
-    }, [search])
+    }, [loadClients])
 
     async function handleArchive(id: number) {
         try {
             await api.post(`/clients/${id}/archive`, {})
             toast.success("Client archived")
             loadClients()
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         }
     }
 
@@ -73,7 +75,7 @@ export default function ClientsPage() {
                 ) : clients.length === 0 ? (
                     <div className="text-center py-12 text-slate-500">No clients found.</div>
                 ) : (
-                    clients.map((client: any) => (
+                    clients.map((client) => (
                         <Card key={client.id}>
                             <CardContent className="flex items-center justify-between p-6">
                                 <div>

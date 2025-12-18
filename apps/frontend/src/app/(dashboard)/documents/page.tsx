@@ -2,16 +2,12 @@
 
 import { useEffect, useState } from "react"
 import {
-    Plus,
-    Search,
     FileText,
-    MoreVertical,
     Trash2,
     ExternalLink,
     PlusCircle,
     Clock,
     Users,
-    CheckCircle2,
     FileBadge
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -38,11 +34,31 @@ import { api } from "@/lib/api"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
+interface Document {
+    id: number
+    type: string
+    status: string
+    client_id: number
+    updated_at: string
+}
+
+interface Template {
+    id: number
+    name: string
+    type: string
+}
+
+interface Client {
+    id: number
+    name: string
+    is_archived?: boolean
+}
+
 export default function DocumentsPage() {
     const router = useRouter()
-    const [documents, setDocuments] = useState([])
-    const [templates, setTemplates] = useState([])
-    const [clients, setClients] = useState([])
+    const [documents, setDocuments] = useState<Document[]>([])
+    const [templates, setTemplates] = useState<Template[]>([])
+    const [clients, setClients] = useState<Client[]>([])
     const [loading, setLoading] = useState(true)
     const [newDocOpen, setNewDocOpen] = useState(false)
     const [creating, setCreating] = useState(false)
@@ -60,9 +76,10 @@ export default function DocumentsPage() {
             ])
             setDocuments(docsData)
             setTemplates(templatesData)
-            setClients(clientsData.filter((c: any) => !c.is_archived))
-        } catch (err: any) {
-            toast.error(err.message)
+            setClients(clientsData.filter((c: Client) => !c.is_archived))
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setLoading(false)
         }
@@ -80,7 +97,13 @@ export default function DocumentsPage() {
         }
 
         setCreating(true)
-        const template = templates.find((t: any) => t.id.toString() === targetTemplate) as any
+        const template = templates.find((t) => t.id.toString() === targetTemplate)
+
+        if (!template) {
+            toast.error("Template not found")
+            setCreating(false)
+            return
+        }
 
         try {
             const newDoc = await api.post("/documents/", {
@@ -95,8 +118,9 @@ export default function DocumentsPage() {
             setNewDocOpen(false)
             // Redirect to the editor page (to be created)
             router.push(`/documents/${newDoc.id}`)
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setCreating(false)
         }
@@ -107,8 +131,9 @@ export default function DocumentsPage() {
             await api.delete(`/documents/${id}`)
             toast.success("Document deleted")
             loadData()
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         }
     }
 
@@ -143,7 +168,7 @@ export default function DocumentsPage() {
                                             <SelectValue placeholder="Choose a model..." />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {templates.map((t: any) => (
+                                            {templates.map((t) => (
                                                 <SelectItem key={t.id} value={t.id.toString()}>
                                                     {t.name} ({t.type})
                                                 </SelectItem>
@@ -158,7 +183,7 @@ export default function DocumentsPage() {
                                             <SelectValue placeholder="Choose a client..." />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {clients.map((c: any) => (
+                                            {clients.map((c) => (
                                                 <SelectItem key={c.id} value={c.id.toString()}>
                                                     {c.name}
                                                 </SelectItem>
@@ -202,7 +227,7 @@ export default function DocumentsPage() {
                     </Card>
                 ) : (
                     <div className="grid gap-3">
-                        {documents.map((doc: any) => (
+                        {documents.map((doc) => (
                             <Card key={doc.id} className="hover:shadow-md transition-all border-slate-100 group">
                                 <CardContent className="flex items-center justify-between p-5">
                                     <div className="flex items-center space-x-4">
@@ -262,6 +287,6 @@ export default function DocumentsPage() {
     )
 }
 
-function cn(...classes: any[]) {
+function cn(...classes: (string | boolean | undefined)[]) {
     return classes.filter(Boolean).join(' ')
 }

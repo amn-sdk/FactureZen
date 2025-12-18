@@ -21,17 +21,50 @@ import { Label } from "@/components/ui/label"
 import { api, API_URL } from "@/lib/api"
 import { toast } from "sonner"
 
+interface Document {
+    id: number
+    type: string
+    status: string
+    updated_at: string
+    template_id: number
+    client_id: number
+    current_data: Record<string, string>
+}
+
+interface Template {
+    id: number
+    name: string
+    version: number
+    type: string
+    schema_json?: {
+        properties?: Record<string, { title?: string }>
+    }
+}
+
+interface Client {
+    id: number
+    name: string
+    address?: string
+    created_at: string
+}
+
+interface DocumentVersion {
+    id: number
+    doc_number: string
+    version_number: number
+}
+
 export default function DocumentEditor() {
     const { id } = useParams()
     const router = useRouter()
-    const [doc, setDoc] = useState<any>(null)
-    const [template, setTemplate] = useState<any>(null)
-    const [client, setClient] = useState<any>(null)
+    const [doc, setDoc] = useState<Document | null>(null)
+    const [template, setTemplate] = useState<Template | null>(null)
+    const [client, setClient] = useState<Client | null>(null)
     const [loading, setLoading] = useState(true)
-    const [formData, setFormData] = useState<any>({})
+    const [formData, setFormData] = useState<Record<string, string>>({})
     const [saving, setSaving] = useState(false)
     const [generating, setGenerating] = useState(false)
-    const [versions, setVersions] = useState<any[]>([])
+    const [versions, setVersions] = useState<DocumentVersion[]>([])
 
     const loadData = useCallback(async () => {
         try {
@@ -49,8 +82,9 @@ export default function DocumentEditor() {
             ])
             setTemplate(templateData)
             setClient(clientData)
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setLoading(false)
         }
@@ -68,8 +102,9 @@ export default function DocumentEditor() {
                 current_data: formData
             })
             toast.success("Progress saved")
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setSaving(false)
         }
@@ -81,8 +116,9 @@ export default function DocumentEditor() {
             await api.post(`/documents/${id}/generate`, {})
             toast.success("Generation started! You will be notified when ready.")
             router.push("/documents")
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setGenerating(false)
         }
@@ -108,8 +144,9 @@ export default function DocumentEditor() {
             a.click()
             a.remove()
             toast.success("Preview DOCX downloaded")
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         }
     }
 

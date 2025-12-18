@@ -34,8 +34,9 @@ export default function LoginPage() {
             localStorage.setItem("token", data.access_token)
             toast.success("Welcome back!")
             router.push("/dashboard")
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setLoading(false)
         }

@@ -6,28 +6,33 @@ import {
     Download,
     Lock,
     ChevronRight,
-    Users,
     FileSpreadsheet,
     ShieldCheck,
     ArrowRightLeft
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { api, API_URL } from "@/lib/api"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+
+interface Company {
+    id: number
+    name: string
+    registration_number?: string
+    period_locked_until?: string
+}
 
 export default function AccountantPage() {
-    const [companies, setCompanies] = useState<any[]>([])
+    const [companies, setCompanies] = useState<Company[]>([])
     const [loading, setLoading] = useState(true)
-    const router = useRouter()
 
     async function loadCompanies() {
         try {
             const data = await api.get("/accountant/companies")
             setCompanies(data)
-        } catch (err: any) {
-            toast.error(err.message)
+        } catch (err) {
+            const error = err as Error
+            toast.error(error.message)
         } finally {
             setLoading(false)
         }
@@ -76,7 +81,7 @@ export default function AccountantPage() {
                         <CardContent className="flex flex-col items-center justify-center py-16 text-slate-500">
                             <Building2 className="h-10 w-10 mb-4 opacity-20" />
                             <p className="font-semibold text-slate-900">Aucun dossier client trouvé</p>
-                            <p className="text-sm mt-1">Vous n'êtes assigné à aucune entreprise en tant que comptable.</p>
+                            <p className="text-sm mt-1">Vous n&apos;êtes assigné à aucune entreprise en tant que comptable.</p>
                         </CardContent>
                     </Card>
                 ) : (
@@ -131,7 +136,7 @@ export default function AccountantPage() {
                     <ArrowRightLeft className="h-8 w-8 text-indigo-400 mb-4" />
                     <h4 className="font-bold text-lg mb-2">Multi-tenancy</h4>
                     <p className="text-slate-400 text-sm leading-relaxed">
-                        Basculez entre vos différents dossiers clients sans vous déconnecter. L'isolation des données est garantie par RLS.
+                        Basculez entre vos différents dossiers clients sans vous déconnecter. L&apos;isolation des données est garantie par RLS.
                     </p>
                 </Card>
                 <Card className="bg-slate-900 border-none rounded-3xl p-6 text-white shadow-xl shadow-slate-200">
