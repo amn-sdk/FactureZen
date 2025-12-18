@@ -214,7 +214,7 @@ export default function DocumentEditor() {
                                 {template?.schema_json?.properties ? (
                                     <div className="grid gap-6">
                                         {Object.keys(template.schema_json.properties).map((key) => {
-                                            const prop = template.schema_json.properties![key]
+                                            const prop = template.schema_json?.properties?.[key]
                                             return (
                                                 <div key={key} className="space-y-2 group">
                                                     <Label htmlFor={key} className="text-sm font-bold text-slate-700 group-focus-within:text-indigo-600 transition-colors">

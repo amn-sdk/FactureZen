@@ -17,8 +17,24 @@ jobs:
           POSTGRES_PASSWORD: postgres
         ports:
           - 5435:5432
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      minio:
+        image: minio/minio
+        env:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin
+        ports:
+          - 9000:9000
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/minio/health/live"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -39,6 +55,11 @@ jobs:
       working-directory: ./apps/backend
       env:
         DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5435/facturezen_test
+        REDIS_URL: redis://localhost:6379/0
+        MINIO_ENDPOINT: localhost:9000
+        MINIO_ROOT_USER: minioadmin
+        MINIO_ROOT_PASSWORD: minioadmin
+        JWT_SECRET: testing-secret
       run: |
         pytest --cov=app tests/
 

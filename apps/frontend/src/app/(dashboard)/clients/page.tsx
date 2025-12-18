@@ -8,8 +8,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { api } from "@/lib/api"
 import { toast } from "sonner"
 
+interface Client {
+    id: number
+    name: string
+    email?: string
+}
+
 export default function ClientsPage() {
-    const [clients, setClients] = useState([])
+    const [clients, setClients] = useState<Client[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
 
@@ -55,7 +61,7 @@ export default function ClientsPage() {
 
             <div className="flex items-center space-x-2">
                 <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -get -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
                         placeholder="Search clients..."
                         className="pl-10"
