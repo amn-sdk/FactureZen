@@ -25,7 +25,8 @@ async function request(endpoint: string, options: RequestInit = {}) {
 }
 
 export const api = {
-    get: (endpoint: string) => request(endpoint, { method: "GET" }),
+    get: (endpoint: string, options: any = {}) => request(endpoint, { method: "GET", ...options }),
     post: (endpoint: string, body: any) => request(endpoint, { method: "POST", body: JSON.stringify(body) }),
     patch: (endpoint: string, body: any) => request(endpoint, { method: "PATCH", body: JSON.stringify(body) }),
+    delete: (endpoint: string) => request(endpoint, { method: "DELETE" }),
 }
