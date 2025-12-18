@@ -33,6 +33,7 @@ class Company(Base):
     address: Mapped[Optional[str]] = mapped_column(String(500))
     vat_number: Mapped[Optional[str]] = mapped_column(String(50))
     registration_number: Mapped[Optional[str]] = mapped_column(String(50)) # SIRET
+    period_locked_until: Mapped[Optional[datetime]] = mapped_column(DateTime) # For compliance
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     memberships: Mapped[List["Membership"]] = relationship(back_populates="company")

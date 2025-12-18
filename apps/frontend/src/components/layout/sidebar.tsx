@@ -9,7 +9,8 @@ import {
     Settings,
     LogOut,
     Library,
-    Zap
+    Zap,
+    ShieldCheck
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -19,6 +20,7 @@ const navigation = [
     { name: "Clients", href: "/clients", icon: Users },
     { name: "Documents", href: "/documents", icon: FileText },
     { name: "Settings", href: "/settings", icon: Settings },
+    { name: "Expert-Comptable", href: "/accountant", icon: ShieldCheck },
 ]
 
 export function Sidebar() {

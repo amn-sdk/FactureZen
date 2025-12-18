@@ -55,6 +55,7 @@ class Document(Base):
     
     current_data: Mapped[dict] = mapped_column(JSON) # Variable values
     current_totals: Mapped[dict] = mapped_column(JSON) # Precomputed totals
+    extra_metadata: Mapped[Optional[dict]] = mapped_column(JSON) # Factur-X / Compliance tags
     
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
@@ -73,6 +74,7 @@ class DocumentVersion(Base):
     snapshot_data: Mapped[dict] = mapped_column(JSON)
     pdf_url: Mapped[str] = mapped_column(String(1000))
     docx_url: Mapped[str] = mapped_column(String(1000))
+    extra_metadata: Mapped[Optional[dict]] = mapped_column(JSON) # Snapshot of Factur-X tags
     
     generated_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
     generated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
