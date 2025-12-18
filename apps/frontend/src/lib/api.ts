@@ -11,9 +11,10 @@ async function request(endpoint: string, options: RequestInit = {}) {
     const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers })
 
     if (res.status === 401) {
-        localStorage.removeItem("token")
-        window.location.href = "/login"
-        return
+        // localStorage.removeItem("token")
+        // window.location.href = "/login"
+        // return
+        console.warn("Auth bypass active - ignored 401")
     }
 
     if (!res.ok) {

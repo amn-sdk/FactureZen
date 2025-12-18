@@ -41,4 +41,18 @@ class TemplateEngine:
             "required": required
         }
 
+    async def render_document(self, docx_content: bytes, data: Dict[str, Any]) -> bytes:
+        """
+        Renders a DOCX template with provided data using docxtpl.
+        """
+        from docxtpl import DocxTemplate
+        import io
+
+        doc = DocxTemplate(io.BytesIO(docx_content))
+        doc.render(data)
+        
+        output = io.BytesIO()
+        doc.save(output)
+        return output.getvalue()
+
 template_engine = TemplateEngine()
