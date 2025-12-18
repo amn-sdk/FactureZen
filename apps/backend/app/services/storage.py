@@ -34,6 +34,10 @@ class StorageService:
         )
         return object_name
 
+    def get_file_content(self, object_name: str) -> bytes:
+        response = self.s3_client.get_object(Bucket=self.bucket_name, Key=object_name)
+        return response["Body"].read()
+
     def get_presigned_url(self, object_name: str, expiration: int = 3600) -> str:
         try:
             response = self.s3_client.generate_presigned_url(
