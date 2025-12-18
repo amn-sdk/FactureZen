@@ -1,0 +1,27 @@
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Backend
+apps/backend/venv/
+apps/backend/__pycache__/
+apps/backend/.pytest_cache/
+apps/backend/*.pyc
+apps/backend/.env
+
+# Frontend
+apps/frontend/node_modules/
+apps/frontend/.next/
+apps/frontend/out/
+apps/frontend/build/
+apps/frontend/.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
