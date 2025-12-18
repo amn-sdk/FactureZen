@@ -237,7 +237,11 @@ export default function TemplatesPage() {
 
             <div className="grid gap-4">
                 {loading ? (
-                    <div>Loading...</div>
+                    <div className="space-y-4">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="h-24 w-full bg-slate-100 animate-pulse rounded-2xl" />
+                        ))}
+                    </div>
                 ) : templates.length === 0 ? (
                     <Card className="border-dashed">
                         <CardContent className="flex flex-col items-center justify-center py-12 text-slate-500">

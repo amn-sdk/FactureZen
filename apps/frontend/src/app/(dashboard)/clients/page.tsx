@@ -65,7 +65,11 @@ export default function ClientsPage() {
 
             <div className="grid gap-4">
                 {loading ? (
-                    <div>Loading...</div>
+                    <div className="space-y-4">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="h-24 w-full bg-slate-100 animate-pulse rounded-2xl" />
+                        ))}
+                    </div>
                 ) : clients.length === 0 ? (
                     <div className="text-center py-12 text-slate-500">No clients found.</div>
                 ) : (

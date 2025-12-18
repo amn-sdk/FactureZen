@@ -46,7 +46,13 @@ export default function AccountantPage() {
         window.location.href = "/dashboard"
     }
 
-    if (loading) return <div className="flex justify-center py-20 animate-pulse text-slate-400">Loading companies...</div>
+    if (loading) return (
+        <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+                <div key={i} className="h-40 w-full bg-slate-100 animate-pulse rounded-2xl" />
+            ))}
+        </div>
+    )
 
     return (
         <div className="space-y-8">

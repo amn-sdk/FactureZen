@@ -182,8 +182,10 @@ export default function DocumentsPage() {
 
             <div className="grid gap-4">
                 {loading ? (
-                    <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                    <div className="space-y-4">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="h-24 w-full bg-slate-100 animate-pulse rounded-2xl" />
+                        ))}
                     </div>
                 ) : documents.length === 0 ? (
                     <Card className="border-dashed border-2 bg-slate-50/50">

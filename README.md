@@ -1,31 +1,27 @@
-# FactureZen
+# FactureZen ⚡️
 
-FactureZen est un SaaS moderne pour la génération de Devis, Factures et Contrats à partir de templates DOCX strictes. 
+FactureZen est une plateforme SaaS complète pour la gestion d'entreprise : Devis, Factures et Contrats. Conçue pour la fidélité visuelle via DOCX et la conformité fiscale française.
 
-## Fonctionnalités
-- **Multi-tenant** : Isolation complète des données par entreprise (PostgreSQL RLS).
-- **Gestion CRM** : Carnet d'adresses clients avec recherche et archivage.
-- **Paramètres Entreprise** : Personnalisation des informations légales et du branding.
-- **Authentification Sécurisée** : JWT avec gestion des tokens de rafraîchissement.
-- **Audit Trail** : Traçabilité complète des actions sensibles.
-- **Génération DOCX/PDF** (En cours) : Pipeline asynchrone pour une fidélité maximale.
+## 🚀 Fonctionnalités Clés
 
-## Stack Technique
-- **Frontend** : Next.js 15, TypeScript, Tailwind CSS, shadcn/ui.
-- **Backend** : FastAPI (Python 3.12), SQLAlchemy 2.0, Pydantic v2.
-- **Infrastructure** : Docker Compose, PostgreSQL 16, Redis, MinIO (S3).
-- **Moteur PDF** : LibreOffice Headless (container).
+- **Multi-tenant (RLS)** : Isolation stricte des données par entreprise via PostgreSQL Row Level Security.
+- **Génération Haute Fidélité** : Pipeline asynchrone (Celery + Redis) utilisant `docxtpl` et Gotenberg pour transformer des fichiers DOCX en PDF parfaits.
+- **Espace Expert-Comptable** : Gestion multi-dossiers, exports FEC/CSV et verrouillage de périodes fiscales.
+- **Conformité & Audit** : Historique des versions de documents et piste d'audit fiable (Audit Trail).
+- **Observability** : Logs structurés JSON et monitoring de performance des requêtes.
 
-## Installation
+## 🛠 Stack Technique
 
-### Prérequis
-- Docker & Docker Compose
-- Python 3.12+
-- Node.js 18+
+- **Frontend** : Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui.
+- **Backend** : FastAPI (Python 3.12), SQLAlchemy 2.0 (Async), Celery + Redis.
+- **Infra (Dev)** : Docker Compose, PostgreSQL 16, MinIO (S3), Gotenberg.
+- **DevOps** : Kubernetes (K8s manifestations), GitHub Actions CI/CD (lint, test, build, deploy).
 
-### Setup Rapide
+## 📦 Installation & Développement
 
-1. **Services (Infrastructure)** :
+### Local (Docker Compose)
+
+1. **Lancer l'infrastructure** :
    ```bash
    docker-compose up -d
    ```
@@ -33,8 +29,7 @@ FactureZen est un SaaS moderne pour la génération de Devis, Factures et Contra
 2. **Backend** :
    ```bash
    cd apps/backend
-   python3 -m venv venv
-   source venv/bin/activate
+   python3 -m venv venv && source venv/bin/activate
    pip install -r requirements.txt
    alembic upgrade head
    uvicorn app.main:app --reload
@@ -43,12 +38,22 @@ FactureZen est un SaaS moderne pour la génération de Devis, Factures et Contra
 3. **Frontend** :
    ```bash
    cd apps/frontend
-   npm install
-   npm run dev
+   npm install && npm run dev
    ```
 
-## Architecture
-Le projet utilise un Monorepo :
-- `apps/backend` : API REST FastAPI.
-- `apps/frontend` : Application Web Next.js.
-- `infra` : Configuration Docker et scripts d'initialisation DB.
+### Kubernetes (Production)
+
+Les manifests se trouvent dans le dossier `/k8s`.
+```bash
+# Appliquer toute la stack
+kubectl apply -f k8s/
+```
+
+## 🧪 Tests & Qualité
+
+- **Backend** : `pytest` (Tests async + DB fixtures).
+- **Frontend** : `vitest` (Composants UI).
+- **CI/CD** : GitHub Actions automatiques sur chaque PR/Push.
+
+---
+FactureZen • Professional SaaS Foundation • 2025
