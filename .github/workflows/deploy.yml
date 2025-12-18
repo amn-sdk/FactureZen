@@ -1,4 +1,4 @@
-name: Deploy to K8s
+name: CDDeploy to K8s
 
 on:
   workflow_run:
