@@ -11,7 +11,8 @@ import {
     RefreshCw,
     Eye,
     CheckCircle2,
-    AlertCircle
+    AlertCircle,
+    Clock
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -30,12 +31,17 @@ export default function DocumentEditor() {
     const [formData, setFormData] = useState<any>({})
     const [saving, setSaving] = useState(false)
     const [generating, setGenerating] = useState(false)
+    const [versions, setVersions] = useState<any[]>([])
 
     const loadData = useCallback(async () => {
         try {
-            const docData = await api.get(`/documents/${id}`)
+            const [docData, versionsData] = await Promise.all([
+                api.get(`/documents/${id}`),
+                api.get(`/documents/${id}/versions`)
+            ])
             setDoc(docData)
             setFormData(docData.current_data || {})
+            setVersions(versionsData)
 
             const [templateData, clientData] = await Promise.all([
                 api.get(`/templates/${docData.template_id}`),
@@ -238,12 +244,52 @@ export default function DocumentEditor() {
                     <div className="bg-green-50 rounded-3xl p-6 border border-green-100 border-dashed">
                         <div className="flex items-center space-x-3 text-green-700 mb-2">
                             <CheckCircle2 className="h-5 w-5" />
-                            <span className="font-bold text-sm">Status: Draft</span>
+                            <span className="font-bold text-sm">Status: {doc.status}</span>
                         </div>
                         <p className="text-xs text-green-600 font-medium leading-relaxed">
-                            Your data is stored in the database. You can generate the final PDF once all variables are filled.
+                            {doc.status === 'DRAFT'
+                                ? "Your data is stored in the database. You can generate the final PDF once all variables are filled."
+                                : "The final versions have been generated and are available for download below."}
                         </p>
                     </div>
+
+                    {versions.length > 0 && (
+                        <Card className="border-none shadow-md rounded-3xl bg-slate-900 overflow-hidden">
+                            <CardHeader className="pb-2 border-b border-white/10">
+                                <CardTitle className="text-xs uppercase tracking-widest text-indigo-400 font-bold flex items-center">
+                                    <Clock className="h-3 w-3 mr-2" /> Generated Versions
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-0">
+                                <div className="divide-y divide-white/5">
+                                    {versions.map((v) => (
+                                        <div key={v.id} className="p-4 space-y-3">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-white font-bold text-sm tracking-tight">{v.doc_number}</span>
+                                                <span className="text-[10px] font-black text-slate-500 uppercase">REV {v.version_number}</span>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    size="sm"
+                                                    className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl text-[10px] font-bold h-8"
+                                                    onClick={() => window.open(`${API_URL}/documents/${id}/download/${v.id}?file_type=pdf`, '_blank')}
+                                                >
+                                                    <FileText className="h-3 w-3 mr-2" /> PDF
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl text-[10px] font-bold h-8"
+                                                    onClick={() => window.open(`${API_URL}/documents/${id}/download/${v.id}?file_type=docx`, '_blank')}
+                                                >
+                                                    <FileText className="h-3 w-3 mr-2 opacity-50" /> DOCX
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
             </div>
         </div>

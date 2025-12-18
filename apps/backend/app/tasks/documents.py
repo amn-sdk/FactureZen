@@ -53,18 +53,29 @@ async def _generate_document_version(document_id: int, user_id: int):
         render_data = {**doc.current_data, "doc_number": doc_number, "date": doc.created_at.strftime("%d/%m/%Y")}
         final_docx = await template_engine.render_document(docx_content, render_data)
         
-        # 4. Upload to MinIO
-        target_path = f"documents/{doc.company_id}/{doc_number}.docx"
-        await storage_service.upload_file(target_path, final_docx)
+        # 4. Upload DOCX to MinIO
+        docx_path = f"documents/{doc.company_id}/{doc_number}.docx"
+        await storage_service.upload_file(docx_path, final_docx)
         
-        # 5. Create Version
+        # 5. Convert to PDF via Gotenberg
+        from app.services.pdf import pdf_service
+        try:
+            pdf_content = await pdf_service.convert_docx_to_pdf(final_docx)
+            pdf_path = f"documents/{doc.company_id}/{doc_number}.pdf"
+            await storage_service.upload_file(pdf_path, pdf_content)
+        except Exception as e:
+            # For now, log and continue, or handle as needed
+            print(f"Error converting to PDF: {e}")
+            pdf_path = None
+
+        # 6. Create Version
         version = DocumentVersion(
             document_id=doc.id,
-            version_number=1, # Logic for incrementing can be added
+            version_number=1, 
             doc_number=doc_number,
             snapshot_data=doc.current_data,
-            docx_url=target_path,
-            pdf_url=target_path.replace(".docx", ".pdf"), # Placeholder until LibreOffice conversion is ready
+            docx_url=docx_path,
+            pdf_url=pdf_path or docx_path, # Fallback to docx if pdf fails
             generated_by=user_id
         )
         session.add(version)

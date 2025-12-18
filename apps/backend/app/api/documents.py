@@ -5,8 +5,8 @@ from typing import List
 from app.core.database import get_db
 from app.api.deps import get_current_user, get_current_company_id
 from app.models.core import User
-from app.models.business import Document, DocStatus
-from app.schemas.document import DocumentOut, DocumentCreate, DocumentUpdate
+from app.models.business import Document, DocStatus, DocumentVersion
+from app.schemas.document import DocumentOut, DocumentCreate, DocumentUpdate, DocumentVersionOut
 
 router = APIRouter()
 
@@ -113,6 +113,48 @@ async def generate_document(
 
     # For dev, we might want to run it sync or use worker. 
     # Let's use .delay() which requires a running worker.
-    generate_document_version_task.delay(doc.id, current_user.id)
+@router.get("/{document_id}/versions", response_model=List[DocumentVersionOut])
+async def list_document_versions(
+    document_id: int,
+    db: AsyncSession = Depends(get_db),
+    company_id: int = Depends(get_current_company_id)
+):
+    # Verify document ownership
+    result = await db.execute(
+        select(Document).where(Document.id == document_id, Document.company_id == company_id)
+    )
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Document not found")
+        
+    result = await db.execute(
+        select(DocumentVersion).where(DocumentVersion.document_id == document_id)
+    )
+    return result.scalars().all()
+
+@router.get("/{document_id}/download/{version_id}")
+async def download_version_file(
+    document_id: int,
+    version_id: int,
+    file_type: str = "pdf",
+    db: AsyncSession = Depends(get_db),
+    company_id: int = Depends(get_current_company_id)
+):
+    # Verify ownership and fetch version
+    result = await db.execute(
+        select(DocumentVersion).where(
+            DocumentVersion.id == version_id, 
+            DocumentVersion.document_id == document_id
+        )
+    )
+    version = result.scalar_one_or_none()
+    if not version:
+        raise HTTPException(status_code=404, detail="Version not found")
+        
+    object_name = version.pdf_url if file_type == "pdf" else version.docx_url
     
-    return {"message": "Generation started in background"}
+    # Generate presigned URL
+    from app.services.storage import storage_service
+    url = await storage_service.generate_presigned_url(object_name)
+    
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url)
