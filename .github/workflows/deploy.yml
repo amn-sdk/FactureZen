@@ -1,4 +1,4 @@
-name: CDDeploy to K8s
+name: CD - Deploy to K8s
 
 on:
   workflow_run:
@@ -18,9 +18,10 @@ jobs:
       uses: azure/setup-kubectl@v3
 
     - name: Set context
-      run: |
-        mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+      uses: azure/k8s-set-context@v3
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
 
     - name: Update image tags
       run: |
