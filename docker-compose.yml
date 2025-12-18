@@ -51,7 +51,7 @@ services:
     image: linuxserver/libreoffice:latest
     container_name: facturezen-libreoffice
     ports:
-      - "3000:3000" # Some images provide a REST API on this port
+      - "3001:3000" # Changed from 3000 to avoid conflict with Next.js
     environment:
       - PUID=1000
       - PGID=1000
